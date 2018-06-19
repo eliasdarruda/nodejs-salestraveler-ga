@@ -36,24 +36,20 @@
             <label for="mutation">Taxa de mutação:</label>
             <input type="text" id="mutation" name="mutation" value="0.15">
         </div>
-        <hr>
-        <button onClick="gerarRotas()">Gerar rotas</button>
-        <hr style="height: 1px; width: 100%;">
-
         <div class="container">
-            <label for="ignoreRatio">Taxa de sobreposição (0 a 2):</label>
-            <input type="text" id="ignoreRatio" name="ignoreRatio" value="0.4">
-            <p>* Com taxa 2 tenta-se preencher o mapa todo sem sobrepor nenhum circulo;</p>
-            <p>* Com taxa 1 tenta-se preencher o mapa sobrepondo no maximo 50% do circulo;</p>
-            <p>* Com taxa 0.4 tenta-se preencher o mapa sobrepondo no maximo 20% do circulo;</p>
+            <label for="qtdPosto">Quantidade de postos:</label>
+            <input type="text" id="qtdPosto" name="qtdPosto" value="30">
+        </div>
+        <div class="container">
+            <label for="ultimo">Evoluir a partir do melhor:</label>
+            <input type="checkbox" id="ultimo" name="ultimo">
         </div>
         <hr>
-        <button onclick="gerarPostos()">Gerar novo Mapa</button>
+        <button onclick="gerarPostos()">Rodar Genético</button>
 
         <div>
             <p><strong>Resultados:</strong></p>
-            <p id="postos">Quantidade de postos: 0</p>
-            <p id="distancia">Distancia da rota: 0</p>
+            <p id="info">Informações</p>
 
             <button onClick="mostrarMelhorRota()">Mostrar Melhor Rota</button>
         </div>
