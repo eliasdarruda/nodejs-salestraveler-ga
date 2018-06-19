@@ -38,6 +38,7 @@ function Circle(x, y, radius) {
 
 function drawMap(map) {
     stroke('gray');
+    areaTotal = 0;
     for (var i = 0; i < WIDTH; i++) {
         for (var j = 0; j < HEIGHT; j++) {
             if (map[i] != undefined && map[i][j] === 1) {
