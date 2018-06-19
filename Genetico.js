@@ -209,6 +209,10 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
     };
 
     genetic.mutate = function(ent) {
+        for (var i = 0; i < ent.postos.length / 6; i++) {
+            var coords = this.getRandomPosFromInsideMap();
+            ent.postos[this.getRandomInt(0, ent.postos.length)] = this.getIndex(coords[0], coords[1]);
+        }
         ent.rota = this.shuffle(ent.rota);
         return ent;
     };
