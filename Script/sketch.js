@@ -130,7 +130,7 @@ function gerarPostos() {
         success: function(res) {
             setCarregando(false);
 
-            if (!GA || GA.fitness > res.fitness) {
+            if (!GA || (GA.areaPreenchida <= (res.areaPreenchida * 0.9) && GA.distancia >= res.distancia)) {
                 localStorage.setItem("GAMAPAFIT", JSON.stringify(res));
             }
             GA = res;
