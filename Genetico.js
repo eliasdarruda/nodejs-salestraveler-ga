@@ -218,6 +218,7 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
     };
 
     genetic.notification = function (pop, generation, stats, isFinished) {
+        console.log(pop.entity[0]);
         console.log('-------------');
         console.log(stats);
         console.log('-------------');
