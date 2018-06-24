@@ -53,7 +53,7 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
         iterations: genConfig.iterations,
         size: genConfig.size,
         mutation: genConfig.mutation,
-        skip: genConfig.iterations / 5,
+        skip: genConfig.iterations / 8,
         webWorkers: true
     };
 
@@ -83,22 +83,6 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
 
     genetic.tourDistance = tourDistance;
 
-    genetic.areaPreechida = function(area) {
-        var areaTotal = 0;
-        var WIDTH = this.userData.coords[0];
-        var HEIGHT = this.userData.coords[1];
-
-        for (var i = 0; i < WIDTH; i++) {
-            for (var j = 0; j < HEIGHT; j++) {
-                var n = area[this.getIndex(i, j)];
-                if (isNaN(n)) break;
-                areaTotal += n;
-            }
-        }
-        
-        return areaTotal;
-    }
-
     genetic.getIndex = function(x, y) {
         return (x + y * this.userData.coords[0]);
     }
@@ -115,29 +99,48 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
         };
     }
 
-    genetic.reduceArea = function(area, index) {
-        var a = area;
+    genetic.calculateAreaPreenchida = function(postos) {
+        var areaPrenchida = 0;
 
+        var that = this;
         var WIDTH = this.userData.coords[0];
         var HEIGHT = this.userData.coords[1];
         var RAD = 60;
 
-        var circle = this.getCoord(index);
+        var buffer = new ArrayBuffer(WIDTH * HEIGHT);
+        var a = new Int8Array(buffer);
 
-        for (var x = 0; x < WIDTH; x++) {
-            for (var y = 0; y < HEIGHT; y++) {
-                var dx = x - circle.x;
-                var dy = y - circle.y;
-                var distanceSquared = dx * dx + dy * dy;
+        var addArea = function(x, y) {
+            var id = that.userData.map[x] && that.userData.map[x][y] === 1 ? that.getIndex(x, y) : -1;
 
-                if (distanceSquared <= RAD*RAD && this.userData.map[x][y] === 1)
-                {
-                    a[this.getIndex(x, y)] = 1;
+            if (id != -1 && a[id] == 0) {
+                a[id] = 1;
+                return 1;
+            }
+            return 0;
+        }
+
+        for (var i = 0; i < postos.length; i++) {
+            var circle = this.getCoord(postos[i]);
+            var xCenter = circle.x;
+            var yCenter = circle.y;
+
+            // Pega todas as coordenadas de dentro do circulo
+            for (var x = xCenter - RAD ; x <= xCenter; x++) {
+                for (var y = yCenter - RAD ; y <= yCenter; y++) {
+                    if ((x - xCenter)*(x - xCenter) + (y - yCenter)*(y - yCenter) <= RAD*RAD) {
+                        var xSym = xCenter - (x - xCenter);
+                        var ySym = yCenter - (y - yCenter);
+
+                        areaPrenchida += addArea(x, y);
+                        areaPrenchida += addArea(x, ySym);
+                        areaPrenchida += addArea(xSym, y);
+                        areaPrenchida += addArea(xSym, ySym);       
+                    }
                 }
             }
         }
-
-        return a;
+        return areaPrenchida;
     }
 
     genetic.shuffle = function(array) {
@@ -190,20 +193,11 @@ function initGenetic(map, areaEmPx, genConfig, sucess) {
     genetic.fitness = function(ent) {
         var err = 0;
 
-        var WIDTH = this.userData.coords[0];
-        var HEIGHT = this.userData.coords[1];
-
-        var buffer = new ArrayBuffer(WIDTH * HEIGHT);
-        var areaPreenchidaOverlap = new Int8Array(buffer);
-        
-        for (var i = 0; i < ent.postos.length; i++) {
-            areaPreenchidaOverlap = this.reduceArea(areaPreenchidaOverlap, ent.postos[i]);
-        }
-        var areaPreenchidaTotal = this.areaPreechida(areaPreenchidaOverlap);
-
+        var areaPreenchidaTotal = this.calculateAreaPreenchida(ent.postos);
         ent.areaTotalPreenchida = areaPreenchidaTotal;
-        err += Math.abs((this.userData.area - areaPreenchidaTotal) * 4);
-        err += this.tourDistance(ent) * 2;
+        
+        err += Math.abs((this.userData.area - areaPreenchidaTotal) * 1.5);
+        err += this.tourDistance(ent) * 2.5;
 
         return err;
     };
